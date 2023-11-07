@@ -25,9 +25,6 @@ class BugzillaIssue(BaseIssue):
                 return requests.get(url, params=get_params, timeout=10)
 
             req = rest_get_bug(issue_id)
-            assert req.status_code != 401, "Wrong auth for Bugzilla"
-            assert req.status_code != 403, "Insufficient permission to access this bug (or the API at all)"
-            assert req.ok, f"Server Status != 2xx: {req.text!r}"
             data = req.json()
             assert data, "Empty JSON Object"
             if data.get("error"):
