@@ -13,7 +13,7 @@ class GitHubIssue(BaseIssue):
             auth = None
             if "client_id" in conf["github"] and "client_secret" in conf["github"]:
                 auth = (conf["github"]["client_id"], conf["github"]["client_secret"])
-            req = requests.get(url, auth=auth, timeout=10)
+            req = requests.get(url, auth=auth, timeout=60)
             assert req.status_code != 403, "Github ratelimiting"
             if req.ok:
                 data = req.json()

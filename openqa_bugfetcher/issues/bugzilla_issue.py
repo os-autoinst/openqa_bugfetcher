@@ -22,7 +22,7 @@ class BugzillaIssue(BaseIssue):
                 cfg = conf["bugzilla"]
                 if cfg.get("api_key"):
                     get_params["api_key"] = cfg["api_key"]
-                return requests.get(url, params=get_params, timeout=10)
+                return requests.get(url, params=get_params, timeout=60)
 
             req = rest_get_bug(issue_id)
             data = req.json()
@@ -46,7 +46,7 @@ class BugzillaIssue(BaseIssue):
         else:
             # Workaround for bugzilla API unavailable from non-employee accounts
             url = f"https://bugzilla.suse.com/show_bug.cgi?id={issue_id}"
-            req = requests.get(url, timeout=10)
+            req = requests.get(url, timeout=60)
             title = req.text.split("<title>", 1)[1].split("</title>", 1)[0]
             assert title != "Access Denied", "Insufficient permission to access this bug"
             if title in ("Invalid Bug ID", "Search by bug number"):

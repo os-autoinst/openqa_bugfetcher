@@ -47,7 +47,7 @@ class BugzillaBaseIssue(BaseIssue):
     def fetch(self, conf):
         def json_rpc_get(url, method, params):
             get_params = OrderedDict({"method": method, "params": json.dumps([params])})
-            return requests.get(url, params=get_params, timeout=10)
+            return requests.get(url, params=get_params, timeout=60)
 
         issue_id = self.bugid.split("#")[1]
         req = json_rpc_get(self.url, "Bug.get", {"ids": [issue_id]})
