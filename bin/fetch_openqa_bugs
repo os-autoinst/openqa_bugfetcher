@@ -55,7 +55,7 @@ for bug_dbid, bugid in bugs.items():
         client.openqa_request("PUT", "bugs/%s" % bug_dbid, data=issue.get_dict())
     except (AssertionError, requests.exceptions.ReadTimeout) as e:
         print("     -> ERROR: %s" % e)
-    except (json.decoder.JSONDecodeError) as e:
+    except (json.decoder.JSONDecodeError, simplejson.errors.JSONDecodeError) as e:
         print("     -> ERROR: %s: JSON: %s…" % e, sys.last_value.doc[:50])
     except Exception as e:
         print(f"Exception occured while fetching {bugid}", file=sys.stderr)
