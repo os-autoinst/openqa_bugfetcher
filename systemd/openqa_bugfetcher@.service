@@ -1,0 +1,6 @@
+[Unit]
+Description=openQA bug fetching task for %i
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/fetch_openqa_bugs /etc/openqa/bugfetcher_%i.conf
