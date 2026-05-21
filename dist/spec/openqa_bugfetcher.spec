@@ -16,7 +16,7 @@
 
 
 Name:           openqa_bugfetcher
-Version:        0.6.7
+Version:        0.7.0
 Release:        0
 Summary:        Tool to update the openqa bug status cache
 License:        GPL-3.0-only
@@ -25,6 +25,8 @@ URL:            https://github.com/os-autoinst/openqa_bugfetcher
 Source:         %{name}-%{version}.tar.xz
 BuildRequires:  python-rpm-macros
 BuildRequires:  python3-devel
+BuildRequires:  python3-build
+BuildRequires:  python3-installer
 BuildRequires:  python3-setuptools
 Requires:       python3-openqa_client
 Requires:       python3-requests

@@ -1,2 +1,37 @@
-[tool.black]
-line-length = 120 
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openqa_bugfetcher"
+version = "0.7.0"
+license = {text = "GPL-3.0-only"}
+description = "Tool to update the openqa bug status cache"
+authors = [{ name = "Dominik Heidler", email = "dheidler@suse.de" }]
+requires-python = ">=3.8"
+dependencies = ["openqa_client", "requests"]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "ty>=0.0.21",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["openqa_bugfetcher*"]
+
+[tool.setuptools]
+script-files = ["bin/fetch_openqa_bugs"]
+
+[tool.setuptools.data-files]
+"/etc/openqa" = ["bugfetcher.conf"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+extend-select = ["E", "F", "D", "Q", "PL", "W", "I", "C9"]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
