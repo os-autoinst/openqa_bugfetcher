@@ -1,17 +1,25 @@
-from abc import ABC, abstractmethod
-from collections import OrderedDict
-from importlib import import_module
+"""Base classes and issue fetcher registry for openqa_bugfetcher."""
+
 import inspect
 import json
 import os
+from abc import ABC, abstractmethod
+from collections import OrderedDict
+from http import HTTPStatus
+from importlib import import_module
 
 import requests
 
+BUGZILLA_ERR_INVALID_BUG_ID = 101
+
 
 class BaseIssue(ABC):
+    """Abstract base class for all issue tracker implementations."""
+
     prefixes = set()
 
     def __init__(self, conf, bugid):
+        """Initialize the issue and fetch its current status."""
         self.bugid = bugid
         self.title = None
         self.priority = None
@@ -24,6 +32,7 @@ class BaseIssue(ABC):
         self.fetch(conf)
 
     def get_dict(self):
+        """Return the issue fields as a dict suitable for the openQA API."""
         return {
             "title": self.title,
             "priority": self.priority,
@@ -37,25 +46,30 @@ class BaseIssue(ABC):
 
     @abstractmethod
     def fetch(self, conf):
+        """Fetch the issue status from the remote tracker and populate instance attributes."""
         pass
 
 
 class BugzillaBaseIssue(BaseIssue):
+    """Base class for Bugzilla-based issue trackers using the JSON-RPC API."""
+
     disabled_assigne = ""
     url = ""
 
     def fetch(self, conf):
+        """Fetch bug status via the Bugzilla JSON-RPC API."""
+
         def json_rpc_get(url, method, params):
             get_params = OrderedDict({"method": method, "params": json.dumps([params])})
             return requests.get(url, params=get_params, timeout=60)
 
         issue_id = self.bugid.split("#")[1]
         req = json_rpc_get(self.url, "Bug.get", {"ids": [issue_id]})
-        assert req.status_code != 401, "Wrong auth for Bugzilla"
-        assert req.status_code != 403, "Insufficient permission to access this bug"
+        assert req.status_code != HTTPStatus.UNAUTHORIZED, "Wrong auth for Bugzilla"
+        assert req.status_code != HTTPStatus.FORBIDDEN, "Insufficient permission to access this bug"
         assert req.ok
         data = req.json()
-        if data["error"] and data["error"]["code"] == 101:
+        if data["error"] and data["error"]["code"] == BUGZILLA_ERR_INVALID_BUG_ID:
             self.existing = False
         else:
             bug = data["result"]["bugs"][0]
@@ -69,7 +83,10 @@ class BugzillaBaseIssue(BaseIssue):
 
 
 class IssueFetcher:
+    """Discovers and dispatches to the correct issue tracker implementation by bug ID prefix."""
+
     def __init__(self, conf):
+        """Load all issue tracker plugins and build the prefix dispatch table."""
         self.conf = conf
         self.prefix_table = {}
         for module in os.listdir(os.path.dirname(__file__)):
@@ -82,6 +99,7 @@ class IssueFetcher:
                         self.prefix_table[prefix] = obj
 
     def get_issue(self, bugid):
+        """Return a populated issue object for the given bug ID."""
         assert "#" in bugid, f"Bad bugid format: {bugid}"
         prefix = bugid.split("#")[0].lower()
         assert prefix in self.prefix_table, f"No implementation found for {bugid}"
