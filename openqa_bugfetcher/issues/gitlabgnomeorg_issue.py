@@ -1,17 +1,22 @@
+"""Issue fetcher for GitLab GNOME (gitlab.gnome.org)."""
+
 import html
+
 import requests
 
 from openqa_bugfetcher.issues import BaseIssue
 
 
 class GitlabGnomeOrgIssue(BaseIssue):
+    """Fetch issue status from gitlab.gnome.org via API or HTML scraping."""
+
     # Example: ggo#GNOME/gtk#6766
     prefixes = {"ggo"}
 
     def fetch(self, conf):
+        """Fetch issue status using the GitLab API if a personal_access_token is configured, otherwise scrape HTML."""
         repo, issue_id = self.bugid.split("#")[1:]
         if "personal_access_token" in conf["gitlab.gnome.org"]:
-
             url = f"https://gitlab.gnome.org/api/v4/issues?iids[]={issue_id}"
             cfg = conf["gitlab.gnome.org"]
             # curl --header "PRIVATE-TOKEN: <MY_PRIVATE_TOKEN>" https://gitlab.gnome.org/api/v4/issues?iids[]=6766

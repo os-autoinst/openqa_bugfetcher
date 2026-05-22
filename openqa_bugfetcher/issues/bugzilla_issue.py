@@ -1,18 +1,22 @@
+"""Issue fetcher for SUSE Bugzilla (bugzilla.suse.com)."""
+
 import html
 
 import requests
 
 from openqa_bugfetcher.issues import BaseIssue
 
-
 # error codes:
 # https://github.com/bugzilla/bugzilla/blob/master/Bugzilla/WebService/Constants.pm#L160
 
 
 class BugzillaIssue(BaseIssue):
+    """Fetch bug status from bugzilla.suse.com via REST API or HTML scraping."""
+
     prefixes = {"boo", "bnc", "bsc"}
 
     def fetch(self, conf):
+        """Fetch bug status using the REST API if an api_key is configured, otherwise scrape HTML."""
         issue_id = self.bugid.split("#")[1]
         if "api_key" in conf["bugzilla"]:
 

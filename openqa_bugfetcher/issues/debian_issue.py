@@ -1,13 +1,19 @@
+"""Issue fetcher for the Debian bug tracker (bugs.debian.org)."""
+
 import html
+
 import requests
 
 from openqa_bugfetcher.issues import BaseIssue
 
 
 class DebianIssue(BaseIssue):
+    """Fetch bug status from bugs.debian.org via HTML scraping."""
+
     prefixes = {"deb"}
 
     def fetch(self, conf):
+        """Fetch bug status by scraping the Debian bug report page."""
         issue_id = self.bugid.split("#")[1]
         print(f"issue_id: {issue_id}")
         if issue_id == "0":

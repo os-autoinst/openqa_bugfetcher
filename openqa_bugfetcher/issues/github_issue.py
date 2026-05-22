@@ -1,12 +1,19 @@
+"""Issue fetcher for GitHub issues via the GitHub REST API."""
+
+from http import HTTPStatus
+
 import requests
 
 from openqa_bugfetcher.issues import BaseIssue
 
 
 class GitHubIssue(BaseIssue):
+    """Fetch issue status from the GitHub REST API."""
+
     prefixes = {"gh"}
 
     def fetch(self, conf):
+        """Fetch issue status from api.github.com, using client credentials if configured."""
         try:
             repo, issue_id = self.bugid.split("#")[1:]
             url = f"https://api.github.com/repos/{repo}/issues/{issue_id}"
@@ -14,7 +21,7 @@ class GitHubIssue(BaseIssue):
             if "client_id" in conf["github"] and "client_secret" in conf["github"]:
                 auth = (conf["github"]["client_id"], conf["github"]["client_secret"])
             req = requests.get(url, auth=auth, timeout=60)
-            assert req.status_code != 403, "Github ratelimiting"
+            assert req.status_code != HTTPStatus.FORBIDDEN, "Github ratelimiting"
             if req.ok:
                 data = req.json()
                 self.title = data["title"]
