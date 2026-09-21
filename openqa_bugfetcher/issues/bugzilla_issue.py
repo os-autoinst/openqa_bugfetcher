@@ -1,6 +1,7 @@
 """Issue fetcher for SUSE Bugzilla (bugzilla.suse.com)."""
 
 import html
+from typing import ClassVar
 
 import requests
 
@@ -13,7 +14,7 @@ from openqa_bugfetcher.issues import BaseIssue
 class BugzillaIssue(BaseIssue):
     """Fetch bug status from bugzilla.suse.com via REST API or HTML scraping."""
 
-    prefixes = {"boo", "bnc", "bsc"}
+    prefixes: ClassVar[set] = {"boo", "bnc", "bsc"}
 
     def fetch(self, conf):
         """Fetch bug status using the REST API if an api_key is configured, otherwise scrape HTML."""

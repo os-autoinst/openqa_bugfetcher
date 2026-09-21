@@ -1,6 +1,7 @@
 """Issue fetcher for GitLab GNOME (gitlab.gnome.org)."""
 
 import html
+from typing import ClassVar
 
 import requests
 
@@ -11,7 +12,7 @@ class GitlabGnomeOrgIssue(BaseIssue):
     """Fetch issue status from gitlab.gnome.org via API or HTML scraping."""
 
     # Example: ggo#GNOME/gtk#6766
-    prefixes = {"ggo"}
+    prefixes: ClassVar[set] = {"ggo"}
 
     def fetch(self, conf):
         """Fetch issue status using the GitLab API if a personal_access_token is configured, otherwise scrape HTML."""

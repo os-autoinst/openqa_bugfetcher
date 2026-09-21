@@ -1,6 +1,7 @@
 """Issue fetcher for SUSE Jira (jira.suse.com)."""
 
 from http import HTTPStatus
+from typing import ClassVar
 
 import requests
 
@@ -10,7 +11,7 @@ from openqa_bugfetcher.issues import BaseIssue
 class JiraIssue(BaseIssue):
     """Fetch issue status from jira.suse.com via the Jira REST API."""
 
-    prefixes = {"jsc"}
+    prefixes: ClassVar[set] = {"jsc"}
 
     def fetch(self, conf):
         """Fetch issue status using basic auth credentials from config."""

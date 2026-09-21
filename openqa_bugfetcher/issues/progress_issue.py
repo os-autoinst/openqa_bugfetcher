@@ -1,6 +1,7 @@
 """Issue fetcher for progress.opensuse.org (Redmine)."""
 
 from http import HTTPStatus
+from typing import ClassVar
 
 import requests
 
@@ -10,7 +11,7 @@ from openqa_bugfetcher.issues import BaseIssue
 class ProgressIssue(BaseIssue):
     """Fetch issue status from progress.opensuse.org via the Redmine REST API."""
 
-    prefixes = {"poo"}
+    prefixes: ClassVar[set] = {"poo"}
 
     def fetch(self, conf):
         """Fetch issue status using the Redmine API key from config."""
