@@ -1,34 +1,35 @@
 #!/usr/bin/python3
+"""Fetch bugs from openQA and update cache."""
 
 import os
 import sys
 
 sys.path.insert(0, os.path.abspath(os.path.dirname(__file__) + "/.."))
 
-import json
-import simplejson
 import configparser
+import json
+
 import requests
-
+import simplejson
 from openqa_client.client import OpenQA_Client
-from openqa_bugfetcher.issues import IssueFetcher
 
+from openqa_bugfetcher.issues import IssueFetcher
 
 CONFIGFILE = "/etc/openqa/bugfetcher.conf"
 FORCE_BUGID = None
 if len(sys.argv) in (2, 3):
-    if sys.argv[1] == "-h" or sys.argv[1] == "--help":
-        print("Usage: %s [config] [bugid]" % sys.argv[0])
-        print("config will default to %s" % CONFIGFILE)
+    if sys.argv[1] in ("-h", "--help"):
+        print(f"Usage: {sys.argv[0]} [config] [bugid]")
+        print(f"config will default to {CONFIGFILE}")
         print("if bugid is specified, only update this bug (even before the time)")
         sys.exit()
     else:
         CONFIGFILE = sys.argv[1]
-    if len(sys.argv) == 3:
+    if len(sys.argv) == 3:  # noqa: PLR2004
         FORCE_BUGID = sys.argv[2]
 
 config = configparser.ConfigParser()
-assert config.read(CONFIGFILE), "Config file '%s' can't be read" % CONFIGFILE
+assert config.read(CONFIGFILE), f"Config file '{CONFIGFILE}' can't be read"
 
 issue_fetcher = IssueFetcher(config)
 client = OpenQA_Client(config["main"]["server"])
@@ -41,23 +42,23 @@ bugs = client.openqa_request("GET", "bugs", {"refreshable": 1, "delta": config["
 if FORCE_BUGID:
     bugs = {k: v for k, v in bugs.items() if v == FORCE_BUGID}
 
-print("Found %i bugs to update" % len(bugs))
+print(f"Found {len(bugs)} bugs to update")
 
 for bug_dbid, bugid in bugs.items():
-    print("%03s: %s" % (bug_dbid, bugid))
+    print(f"{bug_dbid:>3}: {bugid}")
     try:
         issue = issue_fetcher.get_issue(bugid)
-        print("     -> title: %s" % issue.title)
-        print("     -> existing: %s" % issue.existing)
+        print(f"     -> title: {issue.title}")
+        print(f"     -> existing: {issue.existing}")
         if FORCE_BUGID:
             from pprint import pprint
 
             pprint(issue.get_dict())
-        client.openqa_request("PUT", "bugs/%s" % bug_dbid, data=issue.get_dict())
+        client.openqa_request("PUT", f"bugs/{bug_dbid}", data=issue.get_dict())
     except (AssertionError, requests.exceptions.ReadTimeout) as e:
-        print("     -> ERROR: %s" % e)
+        print(f"     -> ERROR: {e}")
     except (json.decoder.JSONDecodeError, simplejson.errors.JSONDecodeError) as e:
-        print("     -> ERROR: %s: JSON: %s…" % (e, e.doc[:50]))
-    except Exception as e:
+        print(f"     -> ERROR: {e}: JSON: {e.doc[:50]}…")
+    except Exception:
         print(f"Exception occured while fetching {bugid}", file=sys.stderr)
-        raise e
+        raise
