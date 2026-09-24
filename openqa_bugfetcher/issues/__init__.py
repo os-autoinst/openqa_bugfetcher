@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from collections import OrderedDict
 from http import HTTPStatus
 from importlib import import_module
+from typing import ClassVar
 
 import requests
 
@@ -16,7 +17,7 @@ BUGZILLA_ERR_INVALID_BUG_ID = 101
 class BaseIssue(ABC):
     """Abstract base class for all issue tracker implementations."""
 
-    prefixes = set()
+    prefixes: ClassVar[set] = set()
 
     def __init__(self, conf, bugid):
         """Initialize the issue and fetch its current status."""
@@ -47,7 +48,6 @@ class BaseIssue(ABC):
     @abstractmethod
     def fetch(self, conf):
         """Fetch the issue status from the remote tracker and populate instance attributes."""
-        pass
 
 
 class BugzillaBaseIssue(BaseIssue):

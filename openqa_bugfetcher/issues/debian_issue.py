@@ -1,6 +1,7 @@
 """Issue fetcher for the Debian bug tracker (bugs.debian.org)."""
 
 import html
+from typing import ClassVar
 
 import requests
 
@@ -10,7 +11,7 @@ from openqa_bugfetcher.issues import BaseIssue
 class DebianIssue(BaseIssue):
     """Fetch bug status from bugs.debian.org via HTML scraping."""
 
-    prefixes = {"deb"}
+    prefixes: ClassVar[set] = {"deb"}
 
     def fetch(self, conf):
         """Fetch bug status by scraping the Debian bug report page."""

@@ -1,6 +1,7 @@
 """Issue fetcher for GitHub issues via the GitHub REST API."""
 
 from http import HTTPStatus
+from typing import ClassVar
 
 import requests
 
@@ -10,7 +11,7 @@ from openqa_bugfetcher.issues import BaseIssue
 class GitHubIssue(BaseIssue):
     """Fetch issue status from the GitHub REST API."""
 
-    prefixes = {"gh"}
+    prefixes: ClassVar[set] = {"gh"}
 
     def fetch(self, conf):
         """Fetch issue status from api.github.com, using client credentials if configured."""
