@@ -5,7 +5,7 @@ merge_queue:
 pull_request_rules:
   - name: automatic merge for dependabot updates
     conditions:
-      - base=main
+      - base=master
       - author=dependabot[bot]
       - -label~=^acceptance-tests-needed|not-ready
       - "#check-failure=0"
